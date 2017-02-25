@@ -80,7 +80,9 @@ export default class App extends Component {
           <main>
             <ThingList things={this.state.things} />
 
-            {this.state.things.length > 0 && <Button onClick={this.clearThings}>Clear</Button>}
+            {this.state.things.length > 0 &&
+              <Button href='#' onClick={this.clearThings}>Clear list</Button>
+            }
           </main>
         </Container>
       </Body>

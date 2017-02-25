@@ -2,18 +2,13 @@ import styled from 'styled-components'
 
 import { primary, subtle } from '../colours'
 
-export default styled.button`
-  background: ${subtle};
-  border: 1px solid ${subtle};
-  color: #fff;
+export default styled.a`
+  color: ${subtle};
+  text-decoration: none;
+  border-bottom: 1px solid ${subtle};
 
   &:active {
-    background: ${primary};
+    color: ${primary};
     border-color: ${primary};
-  }
-
-  &:focus {
-    border-color: ${primary};
-    outline: none;
   }
 `
