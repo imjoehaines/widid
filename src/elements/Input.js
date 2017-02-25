@@ -11,6 +11,7 @@ export default styled.input`
   border-bottom: 1px solid ${subtle};
   color: ${text};
   width: 100%;
+  transition: border-bottom-color 0.25s ease-in-out;
 
   &:focus {
     outline: none;
