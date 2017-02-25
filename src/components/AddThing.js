@@ -1,17 +1,15 @@
 import React from 'react'
 
+import Input from '../elements/Input'
+
 export default ({ newThing, onChange, onSubmit }) =>
   <div>
     <form onSubmit={onSubmit}>
-      <label>
-        Add a thing
-        <input
-          type='text'
-          value={newThing}
-          onChange={onChange}
-        />
-      </label>
-
-      <button>Add</button>
+      <Input
+        type='text'
+        value={newThing}
+        onChange={onChange}
+        placeholder='&hellip;'
+      />
     </form>
   </div>

@@ -1,8 +1,10 @@
 import React from 'react'
 
+import List from '../elements/List'
+
 import Thing from './Thing'
 
 export default ({ things }) =>
-  <ul>
+  <List>
     {things.map(Thing)}
-  </ul>
+  </List>

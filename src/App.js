@@ -1,5 +1,10 @@
 import React, { Component } from 'react'
 
+import Body from './elements/Body'
+import Heading from './elements/Heading'
+import Container from './elements/Container'
+import MainHeader from './elements/MainHeader'
+
 import AddThing from './components/AddThing'
 import ThingList from './components/ThingList'
 
@@ -38,21 +43,23 @@ export default class App extends Component {
 
   render () {
     return (
-      <div>
-        <heading>
-          <h1>widid</h1>
+      <Body>
+        <Container>
+          <Heading>
+            <MainHeader>widid</MainHeader>
 
-          <AddThing
-            newThing={this.state.newThing}
-            onChange={event => this.handleInput(event.target.value)}
-            onSubmit={this.addNewThing}
-          />
-        </heading>
+            <AddThing
+              newThing={this.state.newThing}
+              onChange={event => this.handleInput(event.target.value)}
+              onSubmit={this.addNewThing}
+            />
+          </Heading>
 
-        <main>
-          <ThingList things={this.state.things} />
-        </main>
-      </div>
+          <main>
+            <ThingList things={this.state.things} />
+          </main>
+        </Container>
+      </Body>
     )
   }
 }

@@ -1,4 +1,8 @@
-import React from 'react'
+import styled from 'styled-components'
 
-export default ({ children }) =>
-  <span>{children}</span>
+import { subtle } from '../colours'
+
+export default styled.span`
+  float: right;
+  color: ${subtle};
+`
