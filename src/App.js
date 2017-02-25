@@ -1,12 +1,15 @@
 import React, { Component } from 'react'
 
 import Body from './elements/Body'
+import Button from './elements/Button'
 import Heading from './elements/Heading'
 import Container from './elements/Container'
 import MainHeader from './elements/MainHeader'
 
 import AddThing from './components/AddThing'
 import ThingList from './components/ThingList'
+
+const sessionStorage = global.sessionStorage || { setItem () {}, getItem () {} }
 
 export default class App extends Component {
   constructor () {
@@ -18,6 +21,7 @@ export default class App extends Component {
     }
 
     this.addNewThing = this.addNewThing.bind(this)
+    this.clearThings = this.clearThings.bind(this)
   }
 
   addNewThing (event) {
@@ -34,11 +38,29 @@ export default class App extends Component {
     this.setState({
       things: this.state.things.concat([newThing]),
       newThing: ''
-    })
+    }, () => sessionStorage.setItem('state', JSON.stringify(this.state)))
+  }
+
+  clearThings () {
+    this.setState({
+      things: []
+    }, () => sessionStorage.setItem('state', JSON.stringify(this.state)))
   }
 
   handleInput (newThing) {
     this.setState({ newThing })
+  }
+
+  componentWillMount () {
+    try {
+      const previousState = JSON.parse(sessionStorage.getItem('state'))
+
+      if (!previousState) return
+
+      this.setState(previousState)
+    } catch (err) {
+      return
+    }
   }
 
   render () {
@@ -57,6 +79,8 @@ export default class App extends Component {
 
           <main>
             <ThingList things={this.state.things} />
+
+            {this.state.things.length > 0 && <Button onClick={this.clearThings}>Clear</Button>}
           </main>
         </Container>
       </Body>
