@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-import { primary, subtle } from '../colours'
+import { primary, text, subtle } from '../colours'
 
 export default styled.input`
   font-size: 1.5rem;
@@ -8,7 +8,7 @@ export default styled.input`
   background: none;
   border: none;
   border-bottom: 1px solid ${subtle};
-  color: ${primary};
+  color: ${text};
   width: 100%;
 
   &:focus {
