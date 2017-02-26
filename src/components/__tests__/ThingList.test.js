@@ -1,9 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import MainHeader from './MainHeader'
+import ThingList from '../ThingList'
 
 global.it('renders without crashing', () => {
   const div = document.createElement('div')
-  ReactDOM.render(<MainHeader />, div)
+  ReactDOM.render(<ThingList things={[]} />, div)
 })

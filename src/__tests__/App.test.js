@@ -1,9 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import Button from './Button'
+import App from '../App'
 
 global.it('renders without crashing', () => {
   const div = document.createElement('div')
-  ReactDOM.render(<Button />, div)
+  ReactDOM.render(<App />, div)
 })

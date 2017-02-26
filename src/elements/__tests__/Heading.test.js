@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import Heading from './Heading'
+import Heading from '../Heading'
 
 global.it('renders without crashing', () => {
   const div = document.createElement('div')

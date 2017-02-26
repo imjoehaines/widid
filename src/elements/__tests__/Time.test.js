@@ -1,9 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import AddThing from './AddThing'
+import Time from '../Time'
 
 global.it('renders without crashing', () => {
   const div = document.createElement('div')
-  ReactDOM.render(<AddThing />, div)
+  ReactDOM.render(<Time />, div)
 })
