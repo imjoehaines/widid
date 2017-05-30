@@ -20,6 +20,7 @@ export default class App extends Component {
       things: []
     }
 
+    this.handleInput = this.handleInput.bind(this)
     this.addNewThing = this.addNewThing.bind(this)
     this.clearThings = this.clearThings.bind(this)
   }
@@ -35,20 +36,21 @@ export default class App extends Component {
       time: new Date().toTimeString().slice(0, 5)
     }
 
-    this.setState({
-      things: this.state.things.concat([newThing]),
-      newThing: ''
-    }, () => sessionStorage.setItem('state', JSON.stringify(this.state)))
+    this.setState(
+      previousState => ({ things: previousState.things.concat([newThing]), newThing: '' }),
+      () => sessionStorage.setItem('state', JSON.stringify(this.state))
+    )
   }
 
   clearThings () {
-    this.setState({
-      things: []
-    }, () => sessionStorage.setItem('state', JSON.stringify(this.state)))
+    this.setState(
+      () => ({ things: [] }),
+      () => sessionStorage.setItem('state', JSON.stringify(this.state))
+    )
   }
 
   handleInput (newThing) {
-    this.setState({ newThing })
+    this.setState(() => ({ newThing }))
   }
 
   componentWillMount () {
@@ -57,7 +59,7 @@ export default class App extends Component {
 
       if (!previousState) return
 
-      this.setState(previousState)
+      this.setState(() => previousState)
     } catch (err) {
       return
     }
@@ -72,7 +74,7 @@ export default class App extends Component {
 
             <AddThing
               newThing={this.state.newThing}
-              onChange={event => this.handleInput(event.target.value)}
+              onChange={this.handleInput}
               onSubmit={this.addNewThing}
             />
           </Heading>

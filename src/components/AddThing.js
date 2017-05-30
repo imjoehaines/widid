@@ -7,7 +7,7 @@ export default ({ newThing, onChange, onSubmit }) =>
     <Input
       type='text'
       value={newThing}
-      onChange={onChange}
+      onChange={event => onChange(event.target.value)}
       placeholder='&hellip;'
     />
   </form>
