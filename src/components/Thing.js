@@ -1,9 +1,13 @@
+// @flow
+
 import React from 'react'
 
 import Time from '../elements/Time'
 import Text from '../elements/Text'
 
-export default ({ id, text, time }) =>
+import type ThingType from '../types'
+
+export default ({ id, text, time } : ThingType) =>
   <li key={id}>
     <Text>
       {text}

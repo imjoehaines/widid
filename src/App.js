@@ -1,3 +1,5 @@
+// @flow
+
 import React, { Component } from 'react'
 
 import Body from './elements/Body'
@@ -9,9 +11,20 @@ import MainHeader from './elements/MainHeader'
 import AddThing from './components/AddThing'
 import ThingList from './components/ThingList'
 
-const sessionStorage = global.sessionStorage || { setItem () {}, getItem () {} }
+import type ThingType from './types'
+
+const sessionStorage = global.sessionStorage || { setItem (item, value) {}, getItem (item) { return '' } }
 
 export default class App extends Component {
+  state: {
+    newThing : string,
+    things : Array<ThingType>
+  }
+
+  handleInput : string => void
+  addNewThing : SyntheticInputEvent => void
+  clearThings : () => void
+
   constructor () {
     super()
 
@@ -25,7 +38,7 @@ export default class App extends Component {
     this.clearThings = this.clearThings.bind(this)
   }
 
-  addNewThing (event) {
+  addNewThing (event : SyntheticInputEvent) {
     event.preventDefault()
 
     if (this.state.newThing.trim() === '') return
@@ -37,7 +50,10 @@ export default class App extends Component {
     }
 
     this.setState(
-      previousState => ({ things: previousState.things.concat([newThing]), newThing: '' }),
+      previousState => ({
+        things: previousState.things.concat([newThing]),
+        newThing: ''
+      }),
       () => sessionStorage.setItem('state', JSON.stringify(this.state))
     )
   }
@@ -49,7 +65,7 @@ export default class App extends Component {
     )
   }
 
-  handleInput (newThing) {
+  handleInput (newThing : string) {
     this.setState(() => ({ newThing }))
   }
 
@@ -60,9 +76,7 @@ export default class App extends Component {
       if (!previousState) return
 
       this.setState(() => previousState)
-    } catch (err) {
-      return
-    }
+    } catch (err) {}
   }
 
   render () {

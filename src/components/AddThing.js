@@ -1,8 +1,12 @@
+// @flow
+
 import React from 'react'
 
 import Input from '../elements/Input'
 
-export default ({ newThing, onChange, onSubmit }) =>
+type PropTypes = { newThing : string, onChange : string => void, onSubmit : SyntheticInputEvent => void }
+
+export default ({ newThing, onChange, onSubmit } : PropTypes) =>
   <form onSubmit={onSubmit}>
     <Input
       type='text'
