@@ -23,8 +23,7 @@ main =
 
 
 type alias Thing =
-    { id : Int
-    , text : String
+    { text : String
     , time : Time
     }
 
@@ -96,7 +95,6 @@ update msg model =
 makeThing : Model -> Time -> Thing
 makeThing model time =
     { text = model.newThing
-    , id = List.length model.things + 1
     , time = time
     }
 
