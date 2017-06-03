@@ -97,9 +97,7 @@ update msg model =
             )
 
         ClearThings ->
-            ( { model | things = Array.empty }
-            , Cmd.none
-            )
+            ( { model | things = Array.empty }, Cmd.none )
 
 
 
@@ -117,10 +115,10 @@ view model =
                     ]
                 ]
             , ul [ class "list" ] (Array.toList (Array.map listItem model.things))
-            , if Array.length model.things /= 0 then
-                a [ class "button", href "#", onClick ClearThings ] [ text "Clear list" ]
-              else
+            , if Array.length model.things == 0 then
                 text ""
+              else
+                a [ class "button", href "#", onClick ClearThings ] [ text "Clear list" ]
             ]
         ]
 
