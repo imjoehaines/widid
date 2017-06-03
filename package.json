@@ -1,31 +1,6 @@
 {
-  "name": "widid",
-  "version": "0.1.0",
-  "private": true,
-  "devDependencies": {
-    "babel-eslint": "^7.2.3",
-    "eslint-plugin-flowtype": "^2.33.0",
-    "flow-bin": "^0.47.0",
-    "react-scripts": "0.9.0"
-  },
-  "dependencies": {
-    "react": "^15.5.4",
-    "react-dom": "^15.5.4",
-    "react-redux": "^5.0.5",
-    "redux": "^3.6.0",
-    "styled-components": "^2.0.0"
-  },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject",
-    "flow": "flow"
-  },
-  "standard": {
-    "plugins": [
-      "flowtype"
-    ],
-    "parser": "babel-eslint"
+    "build": "elm-make src/Main.elm --output=public/index.js",
+    "watch": "elm-live src/Main.elm --dir=public --output=public/index.js --open"
   }
 }
