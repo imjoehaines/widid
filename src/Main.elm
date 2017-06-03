@@ -1,6 +1,5 @@
 module Main exposing (..)
 
-import Array exposing (Array)
 import Html exposing (Html, div, p, text, main_, header, h1, form, input, ul, li, span, a)
 import Html.Attributes exposing (class, placeholder, value, href)
 import Html.Events exposing (onSubmit, onInput, onClick)
@@ -32,14 +31,14 @@ type alias Thing =
 
 type alias Model =
     { newThing : String
-    , things : Array Thing
+    , things : List Thing
     }
 
 
 initialModel : Model
 initialModel =
     { newThing = ""
-    , things = Array.empty
+    , things = []
     }
 
 
@@ -85,19 +84,21 @@ update msg model =
         AddThingWithTime time ->
             ( { model
                 | newThing = ""
-                , things =
-                    Array.push
-                        { text = model.newThing
-                        , id = Array.length model.things + 1
-                        , time = time
-                        }
-                        model.things
+                , things = model.things ++ [ makeThing model time ]
               }
             , Cmd.none
             )
 
         ClearThings ->
-            ( { model | things = Array.empty }, Cmd.none )
+            ( { model | things = [] }, Cmd.none )
+
+
+makeThing : Model -> Time -> Thing
+makeThing model time =
+    { text = model.newThing
+    , id = List.length model.things + 1
+    , time = time
+    }
 
 
 
@@ -114,8 +115,8 @@ view model =
                     [ input [ class "input", placeholder "…", value model.newThing, onInput Input ] []
                     ]
                 ]
-            , ul [ class "list" ] (Array.toList (Array.map listItem model.things))
-            , if Array.length model.things == 0 then
+            , ul [ class "list" ] (List.map listItem model.things)
+            , if List.length model.things == 0 then
                 text ""
               else
                 a [ class "button", href "#", onClick ClearThings ] [ text "Clear list" ]
