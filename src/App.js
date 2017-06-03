@@ -1,6 +1,7 @@
 // @flow
 
-import React, { Component } from 'react'
+import React from 'react'
+import { connect } from 'react-redux'
 
 import Body from './elements/Body'
 import Button from './elements/Button'
@@ -11,97 +12,31 @@ import MainHeader from './elements/MainHeader'
 import AddThing from './components/AddThing'
 import ThingList from './components/ThingList'
 
-import type ThingType from './types'
+const App = ({ things, clearThings }) =>
+  <Body>
+    <Container>
+      <Heading>
+        <MainHeader>widid</MainHeader>
 
-const sessionStorage = global.sessionStorage || { setItem (item, value) {}, getItem (item) { return '' } }
+        <AddThing />
+      </Heading>
 
-export default class App extends Component {
-  state: {
-    newThing : string,
-    things : Array<ThingType>
-  }
+      <main>
+        <ThingList />
 
-  handleInput : string => void
-  addNewThing : SyntheticInputEvent => void
-  clearThings : () => void
+        {things.length > 0 &&
+          <Button href='#' onClick={event => { event.preventDefault(); clearThings() }}>Clear list</Button>
+        }
+      </main>
+    </Container>
+  </Body>
 
-  constructor () {
-    super()
+const mapStateToProps = state => ({
+  things: state.things
+})
 
-    this.state = {
-      newThing: '',
-      things: []
-    }
+const mapDispatchToProps = dispatch => ({
+  clearThings: () => dispatch({ type: 'CLEAR_THINGS' })
+})
 
-    this.handleInput = this.handleInput.bind(this)
-    this.addNewThing = this.addNewThing.bind(this)
-    this.clearThings = this.clearThings.bind(this)
-  }
-
-  addNewThing (event : SyntheticInputEvent) {
-    event.preventDefault()
-
-    if (this.state.newThing.trim() === '') return
-
-    const newThing = {
-      text: this.state.newThing,
-      id: this.state.things.length + 1,
-      time: new Date().toTimeString().slice(0, 5)
-    }
-
-    this.setState(
-      previousState => ({
-        things: previousState.things.concat([newThing]),
-        newThing: ''
-      }),
-      () => sessionStorage.setItem('state', JSON.stringify(this.state))
-    )
-  }
-
-  clearThings () {
-    this.setState(
-      () => ({ things: [] }),
-      () => sessionStorage.setItem('state', JSON.stringify(this.state))
-    )
-  }
-
-  handleInput (newThing : string) {
-    this.setState(() => ({ newThing }))
-  }
-
-  componentWillMount () {
-    try {
-      const previousState = JSON.parse(sessionStorage.getItem('state'))
-
-      if (!previousState) return
-
-      this.setState(() => previousState)
-    } catch (err) {}
-  }
-
-  render () {
-    return (
-      <Body>
-        <Container>
-          <Heading>
-            <MainHeader>widid</MainHeader>
-
-            <AddThing
-              newThing={this.state.newThing}
-              onChange={this.handleInput}
-              onSubmit={this.addNewThing}
-            />
-          </Heading>
-
-          <main>
-            <ThingList things={this.state.things} />
-
-            {this.state.things.length > 0 &&
-              <Button href='#' onClick={this.clearThings}>Clear list</Button>
-            }
-          </main>
-        </Container>
-      </Body>
-    )
-  }
-}
+export default connect(mapStateToProps, mapDispatchToProps)(App)
