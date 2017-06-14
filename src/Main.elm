@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Html exposing (Html, div, p, text, main_, header, h1, form, input, ul, li, span, a)
-import Html.Attributes exposing (class, placeholder, value, href)
+import Html.Attributes exposing (class, placeholder, value, href, classList)
 import Html.Events exposing (onSubmit, onInput, onClick)
 import Task
 import Time exposing (Time)
@@ -31,6 +31,8 @@ type alias Thing =
 type alias Model =
     { newThing : String
     , things : List Thing
+    , currentPage : Int
+    , totalPages : Int
     }
 
 
@@ -38,6 +40,8 @@ initialModel : Model
 initialModel =
     { newThing = ""
     , things = []
+    , currentPage = 1
+    , totalPages = 1
     }
 
 
@@ -64,6 +68,8 @@ type Msg
     | AddThing
     | AddThingWithTime Time
     | ClearThings
+    | NextPage
+    | PreviousPage
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -81,15 +87,32 @@ update msg model =
                 )
 
         AddThingWithTime time ->
-            ( { model
-                | newThing = ""
-                , things = model.things ++ [ makeThing model time ]
-              }
-            , Cmd.none
-            )
+            let
+                pages =
+                    ceiling (((toFloat (List.length model.things) + 1)) / (toFloat itemsPerPage))
+            in
+                ( { model
+                    | newThing = ""
+                    , things = model.things ++ [ makeThing model time ]
+                    , totalPages = pages
+                  }
+                , Cmd.none
+                )
+
+        NextPage ->
+            if model.currentPage == model.totalPages then
+                ( model, Cmd.none )
+            else
+                ( { model | currentPage = model.currentPage + 1 }, Cmd.none )
+
+        PreviousPage ->
+            if model.currentPage == 1 then
+                ( model, Cmd.none )
+            else
+                ( { model | currentPage = model.currentPage - 1 }, Cmd.none )
 
         ClearThings ->
-            ( { model | things = [] }, Cmd.none )
+            ( { model | things = [], currentPage = 1, totalPages = 1 }, Cmd.none )
 
 
 makeThing : Model -> Time -> Thing
@@ -103,6 +126,11 @@ makeThing model time =
 -- VIEW
 
 
+itemsPerPage : Int
+itemsPerPage =
+    10
+
+
 view : Model -> Html Msg
 view model =
     div [ class "body" ]
@@ -113,11 +141,9 @@ view model =
                     [ input [ class "input", placeholder "…", value model.newThing, onInput Input ] []
                     ]
                 ]
-            , ul [ class "list" ] (List.map listItem model.things)
-            , if List.length model.things == 0 then
-                text ""
-              else
-                a [ class "button", href "#", onClick ClearThings ] [ text "Clear list" ]
+            , ul [ class "list" ] (List.map listItem (List.take itemsPerPage (List.drop (itemsPerPage * (model.currentPage - 1)) model.things)))
+            , clearLink (List.length model.things)
+            , pagination model
             ]
         ]
 
@@ -130,3 +156,45 @@ listItem thing =
             , span [ class "time" ] [ text (format "%H:%M" thing.time) ]
             ]
         ]
+
+
+clearLink : Int -> Html Msg
+clearLink count =
+    if count == 0 then
+        text ""
+    else
+        a [ class "button", href "#", onClick ClearThings ] [ text "Clear list" ]
+
+
+pagination : Model -> Html Msg
+pagination model =
+    if model.totalPages == 1 then
+        text ""
+    else
+        div [ class "pagination" ]
+            [ p []
+                [ a
+                    [ classList
+                        [ ( "button", True )
+                        , ( "disabled", model.currentPage == 1 )
+                        ]
+                    , href "#"
+                    , onClick PreviousPage
+                    ]
+                    [ text "Previous" ]
+                ]
+            , p []
+                [ text ("Page " ++ (toString model.currentPage) ++ " of " ++ (toString model.totalPages))
+                ]
+            , p []
+                [ a
+                    [ classList
+                        [ ( "button", True )
+                        , ( "disabled", model.currentPage == model.totalPages )
+                        ]
+                    , href "#"
+                    , onClick NextPage
+                    ]
+                    [ text "Next" ]
+                ]
+            ]
