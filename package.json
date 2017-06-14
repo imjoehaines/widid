@@ -1,7 +1,7 @@
 {
   "scripts": {
     "build": "elm-make src/Main.elm --output=public/index.js",
-    "watch": "elm-live src/Main.elm --dir=public --output=public/index.js --open",
+    "watch": "elm-live src/Main.elm --dir=public --output=public/index.js --open --debug",
     "deploy": "yarn build && surge public/ -d widid.surge.sh"
   }
 }
