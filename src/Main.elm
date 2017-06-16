@@ -93,7 +93,7 @@ update msg model =
             in
                 ( { model
                     | newThing = ""
-                    , things = model.things ++ [ makeThing model time ]
+                    , things = [ makeThing model time ] ++ model.things
                     , totalPages = pages
                   }
                 , Cmd.none
