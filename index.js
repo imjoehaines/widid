@@ -2,10 +2,12 @@ const bodyParser = require('body-parser')
 const express = require('express')
 const db = require('sqlite')
 const path = require('path')
+const morgan = require('morgan')
 
 const app = express()
 
 app.use(bodyParser.json())
+app.use(morgan('combined'))
 app.use(express.static(path.resolve(__dirname, 'public')))
 
 app.get('/things', async (request, response, next) => {

@@ -3,11 +3,13 @@
     "build": "elm-make src/Main.elm --output=public/index.js",
     "watch:elm": "elm-live src/Main.elm --dir=public --output=public/index.js --debug",
     "watch:node": "nodemon index.js --ignore 'public/*'",
-    "watch": "yarn run watch:elm & yarn run watch:node"
+    "watch": "yarn run watch:elm & yarn run watch:node",
+    "start": "yarn run build && node index.js"
   },
   "dependencies": {
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
+    "morgan": "^1.8.2",
     "sqlite": "^2.8.0"
   },
   "devDependencies": {
