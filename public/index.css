@@ -88,8 +88,13 @@ body {
   color: var(--subtle);
 }
 
-.icon {
+.icon-container {
   margin-top: .25rem;
+  position: absolute;
+  left: 100%;
+}
+
+.icon {
   margin-left: .5rem;
   padding: .2rem .4rem;
   text-decoration: none;
@@ -98,17 +103,13 @@ body {
   background: rgba(255, 255, 255, .2);
   color: rgba(255, 255, 255, 1);
   transition: all .25s ease-in-out;
-  display: inline-flex;
-  align-items: center;
   font-size: .8rem;
-  position: absolute;
 }
 
 .icon--save,
 .icon--edit {
   background-color: hsla(220, 70%, 77%, .1);
   color: hsla(220, 70%, 77%, .8);
-  right: -3rem;
 }
 
 .icon--save:hover,
@@ -127,7 +128,6 @@ body {
 .icon--delete {
   background-color: hsla(0, 70%, 77%, .1);
   color: hsla(0, 70%, 77%, .8);
-  right: -7rem;
 }
 
 .icon--cancel:hover,
