@@ -22,3 +22,8 @@ type Msg
     | LoadThings (Result Http.Error (List Thing))
     | DeleteThing ThingId
     | DeleteThingRequest (Result Http.Error ThingId)
+    | EditThing Thing
+    | EditInput String
+    | EditThingRequest (Result Http.Error Thing)
+    | CancelEdit
+    | ConfirmEditThing Thing

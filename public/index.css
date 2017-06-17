@@ -98,20 +98,42 @@ body {
   display: inline-flex;
   align-items: center;
   font-size: .8rem;
+  position: absolute;
 }
 
+.icon--save,
+.icon--edit {
+  background-color: hsla(220, 70%, 77%, .1);
+  color: hsla(220, 70%, 77%, .8);
+  right: -3rem;
+}
+
+.icon--save:hover,
+.icon--edit:hover {
+  background-color: hsla(220, 100%, 57%, .1);
+  color: hsla(220, 100%, 57%, 1);
+}
+
+.icon--save:active,
+.icon--edit:active {
+  background-color: hsla(220, 100%, 37%, .1);
+  color: hsla(220, 100%, 37%, 1);
+}
+
+.icon--cancel,
 .icon--delete {
   background-color: hsla(0, 70%, 77%, .1);
-  color: hsla(0, 70%, 77%, 0.8);
-  position: absolute;
-  right: -4.5rem;
+  color: hsla(0, 70%, 77%, .8);
+  right: -7rem;
 }
 
+.icon--cancel:hover,
 .icon--delete:hover {
   background-color: hsla(0, 100%, 57%, .1);
   color: hsla(0, 100%, 57%, 1);
 }
 
+.icon--cancel:active,
 .icon--delete:active {
   background-color: hsla(0, 100%, 37%, .1);
   color: hsla(0, 100%, 37%, 1);
@@ -119,8 +141,4 @@ body {
 
 .thing-row:hover .icon {
   opacity: 1;
-}
-
-.icon__text {
-  margin-left: .2rem;
 }

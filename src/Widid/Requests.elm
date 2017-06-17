@@ -1,4 +1,4 @@
-module Widid.Requests exposing (all, create, delete)
+module Widid.Requests exposing (all, create, edit, delete)
 
 import Http
 import HttpBuilder
@@ -31,3 +31,15 @@ delete id =
         HttpBuilder.delete url
             |> HttpBuilder.withExpect (Http.expectJson Widid.Decoders.thingId)
             |> HttpBuilder.send DeleteThingRequest
+
+
+edit : Thing -> Cmd Msg
+edit thing =
+    let
+        url =
+            "/things/" ++ toString thing.id
+    in
+        HttpBuilder.put url
+            |> HttpBuilder.withExpect (Http.expectJson Widid.Decoders.thing)
+            |> HttpBuilder.withJsonBody (Widid.Encoders.editThing thing)
+            |> HttpBuilder.send EditThingRequest

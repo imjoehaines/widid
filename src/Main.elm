@@ -25,6 +25,7 @@ main =
 type alias Model =
     { newThing : String
     , things : List Thing
+    , maybeEditThing : Maybe Thing
     }
 
 
@@ -32,6 +33,7 @@ initialModel : Model
 initialModel =
     { newThing = ""
     , things = []
+    , maybeEditThing = Nothing
     }
 
 
@@ -81,6 +83,45 @@ update msg model =
         DeleteThingRequest (Err error) ->
             Debug.crash (toString error)
 
+        EditThing thing ->
+            ( { model | maybeEditThing = Just thing }, Cmd.none )
+
+        EditInput text ->
+            case model.maybeEditThing of
+                Nothing ->
+                    ( model, Cmd.none )
+
+                Just thingToEdit ->
+                    let
+                        editedThing =
+                            { thingToEdit | text = text }
+                    in
+                        ( { model | maybeEditThing = Just editedThing }, Cmd.none )
+
+        ConfirmEditThing editedThing ->
+            ( model, Widid.Requests.edit editedThing )
+
+        EditThingRequest (Ok editedThing) ->
+            let
+                things =
+                    List.map (updateEditedThing editedThing) model.things
+            in
+                ( { model | things = things, maybeEditThing = Nothing }, Cmd.none )
+
+        EditThingRequest (Err error) ->
+            Debug.crash (toString error)
+
+        CancelEdit ->
+            ( { model | maybeEditThing = Nothing }, Cmd.none )
+
+
+updateEditedThing : Thing -> Thing -> Thing
+updateEditedThing editedThing thing =
+    if thing.id == editedThing.id then
+        editedThing
+    else
+        thing
+
 
 
 -- VIEW
@@ -96,18 +137,38 @@ view model =
                     [ input [ class "input", placeholder "…", value model.newThing, onInput Input ] []
                     ]
                 ]
-            , ul [ class "list" ] (List.map listItem model.things)
+            , ul [ class "list" ] (List.map (listItem model.maybeEditThing) model.things)
             ]
         ]
 
 
-listItem : Thing -> Html Msg
-listItem thing =
+listItem : Maybe Thing -> Thing -> Html Msg
+listItem maybeEditThing thing =
     li [ class "thing-row" ]
-        [ p [ class "text" ] [ text thing.text ]
-        , span [ class "time" ] [ text (format "%H:%M" thing.time) ]
-        , a [ class "icon icon--delete", href "#", onClick (DeleteThing thing.id) ]
-            [ span [] [ text "×" ]
-            , span [ class "icon__text" ] [ text "Delete" ]
-            ]
-        ]
+        (case maybeEditThing of
+            Nothing ->
+                renderThing thing
+
+            Just editThing ->
+                if editThing.id == thing.id then
+                    renderEditThing editThing
+                else
+                    renderThing thing
+        )
+
+
+renderThing : Thing -> List (Html Msg)
+renderThing thing =
+    [ p [ class "text" ] [ text thing.text ]
+    , span [ class "time" ] [ text (format "%H:%M" thing.time) ]
+    , a [ class "icon icon--edit", href "#", onClick (EditThing thing) ] [ text "Edit" ]
+    , a [ class "icon icon--delete", href "#", onClick (DeleteThing thing.id) ] [ text "Delete" ]
+    ]
+
+
+renderEditThing : Thing -> List (Html Msg)
+renderEditThing thing =
+    [ input [ class "input", onInput EditInput, value thing.text ] []
+    , a [ class "icon icon--save", href "#", onClick (ConfirmEditThing thing) ] [ text "Save" ]
+    , a [ class "icon icon--cancel", href "#", onClick CancelEdit ] [ text "Cancel" ]
+    ]

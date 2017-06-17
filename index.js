@@ -43,6 +43,14 @@ app.post('/things', async (request, response, next) => {
   response.json(thing)
 })
 
+app.put('/things/:thingId', async (request, response, next) => {
+  const { id, text, time } = request.body
+
+  await db.run('UPDATE thing SET text = $text WHERE id = $id', { $text: text, $id: id })
+
+  response.json({ id, text, time })
+})
+
 db.open('./db.sq3')
 .then(() => db.migrate(process.env.APP_ENV !== 'production' && { force: 'last' }))
 .then(() => app.listen(3000))
