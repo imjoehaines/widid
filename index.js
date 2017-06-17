@@ -37,11 +37,11 @@ app.post('/things', async (request, response, next) => {
      { $id: id }
   )
 
+  response.status(201)
   response.json(thing)
 })
 
-Promise.resolve()
-.then(() => db.open('./db.sq3'))
+db.open('./db.sq3')
 .then(() => db.migrate(process.env.APP_ENV !== 'production' && { force: 'last' }))
 .then(() => app.listen(3000))
 .catch(err => console.error(err))
