@@ -87,11 +87,17 @@ body {
 }
 
 .text {
+  margin: 0;
+  flex: 1;
+}
+
+.thing-row {
   color: var(--grey);
   margin: 0;
   padding: .5rem 0;
   font-size: 1.1rem;
   position: relative;
+  display: flex;
 }
 
 .time {
@@ -136,7 +142,7 @@ body {
   color: hsla(0, 100%, 37%, 1);
 }
 
-.text:hover .icon {
+.thing-row:hover .icon {
   opacity: 1;
 }
 
