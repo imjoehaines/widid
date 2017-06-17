@@ -106,7 +106,10 @@ listItem thing =
     li []
         [ p [ class "text" ]
             [ text thing.text
-            , a [ class "icon icon--delete", href "#", onClick (DeleteThing thing.id) ] [ text "×" ]
             , span [ class "time" ] [ text (format "%H:%M" thing.time) ]
+            , a [ class "icon icon--delete", href "#", onClick (DeleteThing thing.id) ]
+                [ span [] [ text "×" ]
+                , span [ class "icon__text" ] [ text "Delete" ]
+                ]
             ]
         ]

@@ -2,7 +2,6 @@
   --grey: #556270;
   --subtle: #8b99a7;
   --highlight: #4ecdc4;
-  --text: #c5ccd3;
 }
 
 * {
@@ -16,7 +15,6 @@ body {
 .body {
   min-height: 100vh;
   width: 100vw;
-  background-color: var(--grey);
   overflow: hidden;
   font-family: -apple-system, BlinkMacSystemFont, Helvetica, sans-serif;
   font-weight: lighter;
@@ -61,7 +59,7 @@ body {
   background: none;
   border: none;
   border-bottom: 1px solid var(--subtle);
-  color: var(--text);
+  color: var(--grey);
   width: 100%;
   transition: border-bottom-color .25s ease-in-out;
 }
@@ -89,7 +87,7 @@ body {
 }
 
 .text {
-  color: var(--text);
+  color: var(--grey);
   margin: 0 0 1rem;
   font-size: 1.1rem;
 }
@@ -106,11 +104,33 @@ body {
 }
 
 .icon {
-  float: right;
-  padding: 0 .2rem;
+  margin-left: .5rem;
+  padding: .2rem .4rem;
   text-decoration: none;
+  opacity: 0;
+  border-radius: .2rem;
+  background: rgba(255, 255, 255, .2);
+  color: rgba(255, 255, 255, 1);
+  transition: all 100ms ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  font-size: .8rem;
 }
 
 .icon--delete {
-  color: #cc6666;
+  background-color: hsla(0, 70%, 77%, .1);
+  color: hsla(0, 70%, 77%, 0.8);
+}
+
+.icon--delete:hover {
+  background-color: hsla(0, 100%, 77%, .1);
+  color: hsla(0, 100%, 77%, 1);
+}
+
+.text:hover .icon {
+  opacity: 1;
+}
+
+.icon__text {
+  margin-left: .2rem;
 }
