@@ -127,8 +127,13 @@ body {
 }
 
 .icon--delete:hover {
-  background-color: hsla(0, 100%, 77%, .1);
-  color: hsla(0, 100%, 77%, 1);
+  background-color: hsla(0, 100%, 57%, .1);
+  color: hsla(0, 100%, 57%, 1);
+}
+
+.icon--delete:active {
+  background-color: hsla(0, 100%, 37%, .1);
+  color: hsla(0, 100%, 37%, 1);
 }
 
 .text:hover .icon {
