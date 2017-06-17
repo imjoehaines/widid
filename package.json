@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "elm-make src/Main.elm --output=public/index.js",
+    "build": "elm-make src/Main.elm --output=temp.js && uglifyjs temp.js --compress --mangle > public/index.js ; rm temp.js",
     "watch:elm": "elm-live src/Main.elm --dir=public --output=public/index.js --debug",
     "watch:node": "nodemon index.js --ignore 'public/*'",
     "watch": "yarn run watch:elm & yarn run watch:node",
@@ -10,7 +10,8 @@
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
     "morgan": "^1.8.2",
-    "sqlite": "^2.8.0"
+    "sqlite": "^2.8.0",
+    "uglify-js": "^3.0.17"
   },
   "devDependencies": {
     "nodemon": "^1.11.0"
