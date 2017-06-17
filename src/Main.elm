@@ -1,15 +1,11 @@
 module Main exposing (..)
 
-import Http
-import HttpBuilder
 import Html exposing (Html, div, p, text, main_, header, h1, form, input, ul, li, span, a)
 import Html.Attributes exposing (class, placeholder, value, href, classList)
 import Html.Events exposing (onSubmit, onInput, onClick)
-import Time exposing (Time)
 import Time.Format exposing (format)
-import Json.Encode
-import Json.Decode exposing (Decoder, int, float, string, list, field)
-import Json.Decode.Pipeline exposing (decode, required, custom)
+import Widid.Types exposing (Thing, ThingId, Msg(..))
+import Widid.Requests
 
 
 main : Program Never Model Msg
@@ -24,13 +20,6 @@ main =
 
 
 -- MODEL
-
-
-type alias Thing =
-    { id : Int
-    , text : String
-    , time : Time
-    }
 
 
 type alias Model =
@@ -48,64 +37,11 @@ initialModel =
 
 init : ( Model, Cmd Msg )
 init =
-    ( initialModel, getInitialData )
-
-
-getInitialData : Cmd Msg
-getInitialData =
-    let
-        request =
-            Http.get "/things" thingListDecoder
-    in
-        Http.send LoadThings request
-
-
-thingListDecoder : Decoder (List Thing)
-thingListDecoder =
-    list thingDecoder
-
-
-thingDecoder : Decoder Thing
-thingDecoder =
-    decode Thing
-        |> required "id" int
-        |> required "text" string
-        |> custom (field "time" float |> Json.Decode.andThen unixSecondsToUnixMilisecondsDecoder)
-
-
-unixSecondsToUnixMilisecondsDecoder : Time -> Decoder Time
-unixSecondsToUnixMilisecondsDecoder time =
-    time
-        * 1000
-        |> Json.Decode.succeed
-
-
-thingIdDecoder : Decoder ThingId
-thingIdDecoder =
-    field "id" int
-
-
-newThingEncoder : String -> Json.Encode.Value
-newThingEncoder text =
-    Json.Encode.object
-        [ ( "text", Json.Encode.string text ) ]
+    ( initialModel, Widid.Requests.all )
 
 
 
 -- UPDATE
-
-
-type alias ThingId =
-    Int
-
-
-type Msg
-    = Input String
-    | AddThing
-    | AddThingRequest (Result Http.Error Thing)
-    | LoadThings (Result Http.Error (List Thing))
-    | DeleteThing ThingId
-    | DeleteThingRequest (Result Http.Error ThingId)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -124,7 +60,7 @@ update msg model =
             if String.trim model.newThing == "" then
                 ( model, Cmd.none )
             else
-                ( model, createThing model.newThing )
+                ( model, Widid.Requests.create model.newThing )
 
         AddThingRequest (Ok thing) ->
             ( { model | things = thing :: model.things, newThing = "" }, Cmd.none )
@@ -133,7 +69,7 @@ update msg model =
             Debug.crash (toString error)
 
         DeleteThing id ->
-            ( model, deleteThing id )
+            ( model, Widid.Requests.delete id )
 
         DeleteThingRequest (Ok id) ->
             let
@@ -144,33 +80,6 @@ update msg model =
 
         DeleteThingRequest (Err error) ->
             Debug.crash (toString error)
-
-
-createThing : String -> Cmd Msg
-createThing text =
-    HttpBuilder.post "/things"
-        |> HttpBuilder.withExpect (Http.expectJson thingDecoder)
-        |> HttpBuilder.withJsonBody (newThingEncoder text)
-        |> HttpBuilder.send AddThingRequest
-
-
-deleteThing : ThingId -> Cmd Msg
-deleteThing id =
-    let
-        url =
-            "/things/" ++ toString id
-    in
-        HttpBuilder.delete url
-            |> HttpBuilder.withExpect (Http.expectJson thingIdDecoder)
-            |> HttpBuilder.send DeleteThingRequest
-
-
-makeThing : Model -> Time -> Thing
-makeThing model time =
-    { id = 1
-    , text = model.newThing
-    , time = time
-    }
 
 
 
