@@ -1,12 +1,16 @@
 {
   "scripts": {
     "build": "elm-make src/Main.elm --output=public/index.js",
-    "watch": "elm-live src/Main.elm --dir=public --output=public/index.js --open --debug",
-    "deploy": "yarn build && surge public/ -d widid.surge.sh"
+    "watch:elm": "elm-live src/Main.elm --dir=public --output=public/index.js --debug",
+    "watch:node": "nodemon index.js",
+    "watch": "yarn run watch:elm & yarn run watch:node"
   },
   "dependencies": {
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
     "sqlite": "^2.8.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
   }
 }
