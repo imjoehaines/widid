@@ -76,7 +76,7 @@ body {
 .list {
   list-style-type: none;
   padding: 0;
-  margin: 1rem 0 0;
+  margin: .5rem 0 0;
   width: 100%;
 }
 
@@ -88,8 +88,10 @@ body {
 
 .text {
   color: var(--grey);
-  margin: 0 0 1rem;
+  margin: 0;
+  padding: .5rem 0;
   font-size: 1.1rem;
+  position: relative;
 }
 
 .time {
@@ -111,7 +113,7 @@ body {
   border-radius: .2rem;
   background: rgba(255, 255, 255, .2);
   color: rgba(255, 255, 255, 1);
-  transition: all 100ms ease-in-out;
+  transition: all .25s ease-in-out;
   display: inline-flex;
   align-items: center;
   font-size: .8rem;
@@ -120,6 +122,8 @@ body {
 .icon--delete {
   background-color: hsla(0, 70%, 77%, .1);
   color: hsla(0, 70%, 77%, 0.8);
+  position: absolute;
+  right: -4.5rem;
 }
 
 .icon--delete:hover {
