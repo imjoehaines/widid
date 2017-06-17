@@ -20,27 +20,6 @@ body {
   font-weight: lighter;
 }
 
-.button {
-  color: var(--subtle);
-  text-decoration: none;
-  border-bottom: 1px solid var(--subtle);
-  transition: border-bottom-color .25s ease-in-out;
-}
-
-.button:not(.disabled):hover {
-  border-bottom-color: var(--highlight);
-}
-
-.button:not(.disabled):active {
-  color: var(--highlight);
-  border-bottom-color: var(--highlight);
-}
-
-.disabled {
-  opacity: .5;
-  cursor: not-allowed;
-}
-
 .container {
   max-width: 500px;
   padding: 1rem;
@@ -104,12 +83,6 @@ body {
 
 .time {
   float: right;
-  color: var(--subtle);
-}
-
-.pagination {
-  display: flex;
-  justify-content: space-between;
   color: var(--subtle);
 }
 
