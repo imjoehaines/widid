@@ -1,17 +1,20 @@
 module Main exposing (..)
 
+import Http
 import Html exposing (Html, div, p, text, main_, header, h1, form, input, ul, li, span, a)
 import Html.Attributes exposing (class, placeholder, value, href, classList)
 import Html.Events exposing (onSubmit, onInput, onClick)
 import Task
 import Time exposing (Time)
 import Time.Format exposing (format)
+import Json.Decode exposing (Decoder, float, string, list, field)
+import Json.Decode.Pipeline exposing (decode, required, custom)
 
 
 main : Program Never Model Msg
 main =
     Html.program
-        { subscriptions = subscriptions
+        { subscriptions = (\_ -> Sub.none)
         , view = view
         , update = update
         , init = init
@@ -31,8 +34,6 @@ type alias Thing =
 type alias Model =
     { newThing : String
     , things : List Thing
-    , currentPage : Int
-    , totalPages : Int
     }
 
 
@@ -40,23 +41,43 @@ initialModel : Model
 initialModel =
     { newThing = ""
     , things = []
-    , currentPage = 1
-    , totalPages = 1
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( initialModel, Cmd.none )
+    ( initialModel, getInitialData )
 
 
+getInitialData : Cmd Msg
+getInitialData =
+    let
+        url =
+            "/things"
 
--- SUBSCRIPTIONS
+        request =
+            Http.get url thingListDecoder
+    in
+        Http.send LoadThings request
 
 
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
+thingListDecoder : Decoder (List Thing)
+thingListDecoder =
+    list thingDecoder
+
+
+thingDecoder : Decoder Thing
+thingDecoder =
+    decode Thing
+        |> required "text" string
+        |> custom (field "time" float |> Json.Decode.andThen unixSecondsToUnixMilisecondsDecoder)
+
+
+unixSecondsToUnixMilisecondsDecoder : Float -> Decoder Float
+unixSecondsToUnixMilisecondsDecoder time =
+    time
+        * 1000
+        |> Json.Decode.succeed
 
 
 
@@ -68,13 +89,18 @@ type Msg
     | AddThing
     | AddThingWithTime Time
     | ClearThings
-    | NextPage
-    | PreviousPage
+    | LoadThings (Result Http.Error (List Thing))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        LoadThings (Ok things) ->
+            ( { model | things = things }, Cmd.none )
+
+        LoadThings (Err error) ->
+            Debug.crash (toString error)
+
         Input text ->
             ( { model | newThing = text }, Cmd.none )
 
@@ -87,32 +113,15 @@ update msg model =
                 )
 
         AddThingWithTime time ->
-            let
-                pages =
-                    ceiling (((toFloat (List.length model.things) + 1)) / (toFloat itemsPerPage))
-            in
-                ( { model
-                    | newThing = ""
-                    , things = [ makeThing model time ] ++ model.things
-                    , totalPages = pages
-                  }
-                , Cmd.none
-                )
-
-        NextPage ->
-            if model.currentPage == model.totalPages then
-                ( model, Cmd.none )
-            else
-                ( { model | currentPage = model.currentPage + 1 }, Cmd.none )
-
-        PreviousPage ->
-            if model.currentPage == 1 then
-                ( model, Cmd.none )
-            else
-                ( { model | currentPage = model.currentPage - 1 }, Cmd.none )
+            ( { model
+                | newThing = ""
+                , things = [ makeThing model time ] ++ model.things
+              }
+            , Cmd.none
+            )
 
         ClearThings ->
-            ( { model | things = [], currentPage = 1, totalPages = 1 }, Cmd.none )
+            ( { model | things = [] }, Cmd.none )
 
 
 makeThing : Model -> Time -> Thing
@@ -141,9 +150,8 @@ view model =
                     [ input [ class "input", placeholder "…", value model.newThing, onInput Input ] []
                     ]
                 ]
-            , ul [ class "list" ] (List.map listItem (List.take itemsPerPage (List.drop (itemsPerPage * (model.currentPage - 1)) model.things)))
+            , ul [ class "list" ] (List.map listItem model.things)
             , clearLink (List.length model.things)
-            , pagination model
             ]
         ]
 
@@ -164,37 +172,3 @@ clearLink count =
         text ""
     else
         a [ class "button", href "#", onClick ClearThings ] [ text "Clear list" ]
-
-
-pagination : Model -> Html Msg
-pagination model =
-    if model.totalPages == 1 then
-        text ""
-    else
-        div [ class "pagination" ]
-            [ p []
-                [ a
-                    [ classList
-                        [ ( "button", True )
-                        , ( "disabled", model.currentPage == 1 )
-                        ]
-                    , href "#"
-                    , onClick PreviousPage
-                    ]
-                    [ text "Previous" ]
-                ]
-            , p []
-                [ text ("Page " ++ (toString model.currentPage) ++ " of " ++ (toString model.totalPages))
-                ]
-            , p []
-                [ a
-                    [ classList
-                        [ ( "button", True )
-                        , ( "disabled", model.currentPage == model.totalPages )
-                        ]
-                    , href "#"
-                    , onClick NextPage
-                    ]
-                    [ text "Next" ]
-                ]
-            ]
