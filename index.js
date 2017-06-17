@@ -7,9 +7,17 @@ const app = express()
 app.use(express.static(path.resolve(__dirname, 'public')))
 
 app.get('/things', async (request, response, next) => {
-  const things = await db.all(`SELECT "text", CAST(strftime("%s", date_created) AS INT) AS time FROM thing`)
+  const things = await db.all(`SELECT id, "text", CAST(strftime("%s", date_created) AS INT) AS time FROM thing`)
 
-  response.send(things)
+  response.json(things)
+})
+
+app.delete('/things/:thingId', async (request, response, next) => {
+  const { thingId } = request.params
+
+  await db.run('DELETE FROM thing WHERE id = $thingId', { $thingId: thingId })
+
+  response.json({ id: +thingId })
 })
 
 Promise.resolve()

@@ -104,3 +104,13 @@ body {
   justify-content: space-between;
   color: var(--subtle);
 }
+
+.icon {
+  float: right;
+  padding: 0 .2rem;
+  text-decoration: none;
+}
+
+.icon--delete {
+  color: #cc6666;
+}

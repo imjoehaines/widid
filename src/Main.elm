@@ -1,13 +1,14 @@
 module Main exposing (..)
 
 import Http
+import HttpBuilder
 import Html exposing (Html, div, p, text, main_, header, h1, form, input, ul, li, span, a)
 import Html.Attributes exposing (class, placeholder, value, href, classList)
 import Html.Events exposing (onSubmit, onInput, onClick)
 import Task
 import Time exposing (Time)
 import Time.Format exposing (format)
-import Json.Decode exposing (Decoder, float, string, list, field)
+import Json.Decode exposing (Decoder, int, float, string, list, field)
 import Json.Decode.Pipeline exposing (decode, required, custom)
 
 
@@ -26,7 +27,8 @@ main =
 
 
 type alias Thing =
-    { text : String
+    { id : Int
+    , text : String
     , time : Time
     }
 
@@ -52,11 +54,8 @@ init =
 getInitialData : Cmd Msg
 getInitialData =
     let
-        url =
-            "/things"
-
         request =
-            Http.get url thingListDecoder
+            Http.get "/things" thingListDecoder
     in
         Http.send LoadThings request
 
@@ -69,19 +68,29 @@ thingListDecoder =
 thingDecoder : Decoder Thing
 thingDecoder =
     decode Thing
+        |> required "id" int
         |> required "text" string
         |> custom (field "time" float |> Json.Decode.andThen unixSecondsToUnixMilisecondsDecoder)
 
 
-unixSecondsToUnixMilisecondsDecoder : Float -> Decoder Float
+unixSecondsToUnixMilisecondsDecoder : Time -> Decoder Time
 unixSecondsToUnixMilisecondsDecoder time =
     time
         * 1000
         |> Json.Decode.succeed
 
 
+thingIdDecoder : Decoder ThingId
+thingIdDecoder =
+    field "id" int
+
+
 
 -- UPDATE
+
+
+type alias ThingId =
+    Int
 
 
 type Msg
@@ -90,6 +99,8 @@ type Msg
     | AddThingWithTime Time
     | ClearThings
     | LoadThings (Result Http.Error (List Thing))
+    | DeleteThing ThingId
+    | DeleteThingRequest (Result Http.Error ThingId)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -123,21 +134,41 @@ update msg model =
         ClearThings ->
             ( { model | things = [] }, Cmd.none )
 
+        DeleteThing id ->
+            ( model, deleteThing id )
+
+        DeleteThingRequest (Ok id) ->
+            let
+                things =
+                    List.filter (\thing -> thing.id /= id) model.things
+            in
+                ( { model | things = things }, Cmd.none )
+
+        DeleteThingRequest (Err error) ->
+            Debug.crash (toString error)
+
+
+deleteThing : ThingId -> Cmd Msg
+deleteThing id =
+    let
+        url =
+            "/things/" ++ toString id
+    in
+        HttpBuilder.delete url
+            |> HttpBuilder.withExpect (Http.expectJson thingIdDecoder)
+            |> HttpBuilder.send DeleteThingRequest
+
 
 makeThing : Model -> Time -> Thing
 makeThing model time =
-    { text = model.newThing
+    { id = 1
+    , text = model.newThing
     , time = time
     }
 
 
 
 -- VIEW
-
-
-itemsPerPage : Int
-itemsPerPage =
-    10
 
 
 view : Model -> Html Msg
@@ -161,6 +192,7 @@ listItem thing =
     li []
         [ p [ class "text" ]
             [ text thing.text
+            , a [ class "icon icon--delete", href "#", onClick (DeleteThing thing.id) ] [ text "×" ]
             , span [ class "time" ] [ text (format "%H:%M" thing.time) ]
             ]
         ]
