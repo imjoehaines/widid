@@ -4,7 +4,7 @@
     "watch:elm": "elm-live src/Main.elm --dir=public --output=public/index.js --debug",
     "watch:node": "nodemon index.js --ignore 'public/*'",
     "watch": "yarn run watch:elm & yarn run watch:node",
-    "start": "yarn run build && node index.js"
+    "start": "yarn run build && APP_ENV=production node index.js"
   },
   "dependencies": {
     "body-parser": "^1.17.2",
