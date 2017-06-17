@@ -168,7 +168,9 @@ renderThing thing =
 
 renderEditThing : Thing -> List (Html Msg)
 renderEditThing thing =
-    [ input [ class "input", onInput EditInput, value thing.text ] []
-    , a [ class "icon icon--save", href "#", onClick (ConfirmEditThing thing) ] [ text "Save" ]
-    , a [ class "icon icon--cancel", href "#", onClick CancelEdit ] [ text "Cancel" ]
+    [ form [ class "edit-form", onSubmit (ConfirmEditThing thing) ]
+        [ input [ class "input", onInput EditInput, value thing.text ] []
+        , a [ class "icon icon--save", href "#", onClick (ConfirmEditThing thing) ] [ text "Save" ]
+        , a [ class "icon icon--cancel", href "#", onClick CancelEdit ] [ text "Cancel" ]
+        ]
     ]

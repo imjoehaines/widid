@@ -44,11 +44,17 @@ app.post('/things', async (request, response, next) => {
 })
 
 app.put('/things/:thingId', async (request, response, next) => {
-  const { id, text, time } = request.body
+  const { id, text } = request.body
 
-  await db.run('UPDATE thing SET text = $text WHERE id = $id', { $text: text, $id: id })
+  const { lastID } = await db.run('UPDATE thing SET text = $text WHERE id = $id', { $text: text, $id: id })
+  const thing = await db.get(
+    `SELECT id, "text", CAST(strftime("%s", date_created) AS INT) AS time
+     FROM thing
+     WHERE id = $id`,
+     { $id: lastID }
+  )
 
-  response.json({ id, text, time })
+  response.json(thing)
 })
 
 db.open('./db.sq3')

@@ -67,6 +67,7 @@ body {
 
 .text {
   margin: 0;
+  padding: .25rem 0;
   flex: 1;
   word-break: break-all;
   hyphens: auto;
@@ -83,10 +84,12 @@ body {
 
 .time {
   float: right;
+  padding: .25rem 0;
   color: var(--subtle);
 }
 
 .icon {
+  margin-top: .25rem;
   margin-left: .5rem;
   padding: .2rem .4rem;
   text-decoration: none;
@@ -141,4 +144,9 @@ body {
 
 .thing-row:hover .icon {
   opacity: 1;
+}
+
+.edit-form {
+  font-size: 1rem;
+  width: 100%;
 }
