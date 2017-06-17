@@ -5,9 +5,9 @@ import HttpBuilder
 import Html exposing (Html, div, p, text, main_, header, h1, form, input, ul, li, span, a)
 import Html.Attributes exposing (class, placeholder, value, href, classList)
 import Html.Events exposing (onSubmit, onInput, onClick)
-import Task
 import Time exposing (Time)
 import Time.Format exposing (format)
+import Json.Encode
 import Json.Decode exposing (Decoder, int, float, string, list, field)
 import Json.Decode.Pipeline exposing (decode, required, custom)
 
@@ -85,6 +85,12 @@ thingIdDecoder =
     field "id" int
 
 
+newThingEncoder : String -> Json.Encode.Value
+newThingEncoder text =
+    Json.Encode.object
+        [ ( "text", Json.Encode.string text ) ]
+
+
 
 -- UPDATE
 
@@ -96,8 +102,7 @@ type alias ThingId =
 type Msg
     = Input String
     | AddThing
-    | AddThingWithTime Time
-    | ClearThings
+    | AddThingRequest (Result Http.Error Thing)
     | LoadThings (Result Http.Error (List Thing))
     | DeleteThing ThingId
     | DeleteThingRequest (Result Http.Error ThingId)
@@ -119,20 +124,13 @@ update msg model =
             if String.trim model.newThing == "" then
                 ( model, Cmd.none )
             else
-                ( model
-                , Task.perform AddThingWithTime Time.now
-                )
+                ( model, createThing model.newThing )
 
-        AddThingWithTime time ->
-            ( { model
-                | newThing = ""
-                , things = [ makeThing model time ] ++ model.things
-              }
-            , Cmd.none
-            )
+        AddThingRequest (Ok thing) ->
+            ( { model | things = thing :: model.things, newThing = "" }, Cmd.none )
 
-        ClearThings ->
-            ( { model | things = [] }, Cmd.none )
+        AddThingRequest (Err error) ->
+            Debug.crash (toString error)
 
         DeleteThing id ->
             ( model, deleteThing id )
@@ -146,6 +144,14 @@ update msg model =
 
         DeleteThingRequest (Err error) ->
             Debug.crash (toString error)
+
+
+createThing : String -> Cmd Msg
+createThing text =
+    HttpBuilder.post "/things"
+        |> HttpBuilder.withExpect (Http.expectJson thingDecoder)
+        |> HttpBuilder.withJsonBody (newThingEncoder text)
+        |> HttpBuilder.send AddThingRequest
 
 
 deleteThing : ThingId -> Cmd Msg
@@ -182,7 +188,6 @@ view model =
                     ]
                 ]
             , ul [ class "list" ] (List.map listItem model.things)
-            , clearLink (List.length model.things)
             ]
         ]
 
@@ -196,11 +201,3 @@ listItem thing =
             , span [ class "time" ] [ text (format "%H:%M" thing.time) ]
             ]
         ]
-
-
-clearLink : Int -> Html Msg
-clearLink count =
-    if count == 0 then
-        text ""
-    else
-        a [ class "button", href "#", onClick ClearThings ] [ text "Clear list" ]

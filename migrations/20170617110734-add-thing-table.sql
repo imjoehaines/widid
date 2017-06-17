@@ -6,8 +6,6 @@ CREATE TABLE thing (
   date_created INTEGER NOT NULL
 );
 
-INSERT INTO thing VALUES (1, 'Hello', CURRENT_TIMESTAMP);
-
 -- Down
 
 DROP TABLE thing;

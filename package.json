@@ -5,6 +5,7 @@
     "deploy": "yarn build && surge public/ -d widid.surge.sh"
   },
   "dependencies": {
+    "body-parser": "^1.17.2",
     "express": "^4.15.3",
     "sqlite": "^2.8.0"
   }
