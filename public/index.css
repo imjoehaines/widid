@@ -152,3 +152,18 @@ body {
 .edit-form {
   width: 100%;
 }
+
+.loading-indicator::after {
+  /* start at 3 periods incase browser doesn't support `content` animations */
+  content: '...';
+  animation: loadingPeriods 1s linear infinite alternate;
+}
+
+@keyframes loadingPeriods {
+  50% {
+    content: '..';
+  }
+  100% {
+    content: '.';
+  }
+}

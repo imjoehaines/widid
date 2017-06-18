@@ -136,7 +136,7 @@ view model =
             [ header [ class "heading" ]
                 [ h1 [ class "main-heading" ] [ text "widid" ]
                 , (if model.loading == True then
-                    text "loading..."
+                    span [ class "loading-indicator" ] [ text "Loading" ]
                    else
                     form [ onSubmit AddThing ]
                         [ input [ class "input", placeholder "…", value model.newThing, onInput Input ] []
