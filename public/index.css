@@ -145,6 +145,7 @@ body {
   color: hsla(0, 100%, 37%, 1);
 }
 
+.icon:focus,
 .thing-row:hover .icon {
   opacity: 1;
 }
