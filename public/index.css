@@ -37,6 +37,7 @@ body {
   padding: .25rem 0;
   background: none;
   border: none;
+  border-top: 1px solid transparent;
   border-bottom: 1px solid var(--subtle);
   color: var(--grey);
   width: 100%;
@@ -71,6 +72,8 @@ body {
   flex: 1;
   word-break: break-all;
   hyphens: auto;
+  border-top: 1px solid transparent;
+  border-bottom: 1px solid transparent;
 }
 
 .thing-row {
