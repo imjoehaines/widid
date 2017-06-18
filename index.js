@@ -59,6 +59,6 @@ app.put('/things/:thingId', async (request, response, next) => {
 })
 
 db.open('./db.sq3')
-.then(() => db.migrate(process.env.APP_ENV !== 'production' && { force: 'last' }))
+.then(() => db.migrate(process.env.NODE_ENV !== 'production' && { force: 'last' }))
 .then(() => app.listen(3000))
 .catch(err => console.error(err))
