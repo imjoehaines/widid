@@ -26,6 +26,7 @@ type alias Model =
     { newThing : String
     , things : List Thing
     , maybeEditThing : Maybe Thing
+    , loading : Bool
     }
 
 
@@ -34,6 +35,7 @@ initialModel =
     { newThing = ""
     , things = []
     , maybeEditThing = Nothing
+    , loading = True
     }
 
 
@@ -50,7 +52,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         LoadThings (Ok things) ->
-            ( { model | things = things }, Cmd.none )
+            ( { model | things = things, loading = False }, Cmd.none )
 
         LoadThings (Err error) ->
             Debug.crash (toString error)
@@ -133,9 +135,13 @@ view model =
         [ div [ class "container" ]
             [ header [ class "heading" ]
                 [ h1 [ class "main-heading" ] [ text "widid" ]
-                , form [ onSubmit AddThing ]
-                    [ input [ class "input", placeholder "…", value model.newThing, onInput Input ] []
-                    ]
+                , (if model.loading == True then
+                    text "loading..."
+                   else
+                    form [ onSubmit AddThing ]
+                        [ input [ class "input", placeholder "…", value model.newThing, onInput Input ] []
+                        ]
+                  )
                 ]
             , ul [ class "list" ] (List.map (listItem model.maybeEditThing) model.things)
             ]
