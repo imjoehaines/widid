@@ -101,7 +101,10 @@ update msg model =
                         ( { model | maybeEditThing = Just editedThing }, Cmd.none )
 
         ConfirmEditThing editedThing ->
-            ( model, Widid.Requests.edit editedThing )
+            if String.trim editedThing.text == "" then
+                ( model, Cmd.none )
+            else
+                ( model, Widid.Requests.edit editedThing )
 
         EditThingRequest (Ok editedThing) ->
             let
