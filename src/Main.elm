@@ -1,8 +1,9 @@
 module Main exposing (..)
 
-import Html exposing (Html, div, p, text, main_, header, h1, form, input, ul, li, span, a)
+import Html exposing (Html, div, p, text, main_, header, h1, h2, form, input, ul, li, span, a)
 import Html.Attributes exposing (class, placeholder, value, href, classList)
 import Html.Events exposing (onSubmit, onInput, onClick)
+import Http
 import Time.Format exposing (format)
 import Widid.Types exposing (Thing, ThingId, Msg(..))
 import Widid.Requests
@@ -27,6 +28,7 @@ type alias Model =
     , things : List Thing
     , maybeEditThing : Maybe Thing
     , loading : Bool
+    , maybeError : Maybe Http.Error
     }
 
 
@@ -36,6 +38,7 @@ initialModel =
     , things = []
     , maybeEditThing = Nothing
     , loading = True
+    , maybeError = Nothing
     }
 
 
@@ -48,6 +51,11 @@ init =
 -- UPDATE
 
 
+httpError : Model -> Http.Error -> Model
+httpError model error =
+    { model | maybeError = Just error }
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -55,7 +63,7 @@ update msg model =
             ( { model | things = things, loading = False }, Cmd.none )
 
         LoadThings (Err error) ->
-            Debug.crash (toString error)
+            ( httpError model error, Cmd.none )
 
         Input text ->
             ( { model | newThing = text }, Cmd.none )
@@ -70,7 +78,7 @@ update msg model =
             ( { model | things = thing :: model.things, newThing = "" }, Cmd.none )
 
         AddThingRequest (Err error) ->
-            Debug.crash (toString error)
+            ( httpError model error, Cmd.none )
 
         DeleteThing id ->
             ( model, Widid.Requests.delete id )
@@ -83,7 +91,7 @@ update msg model =
                 ( { model | things = things }, Cmd.none )
 
         DeleteThingRequest (Err error) ->
-            Debug.crash (toString error)
+            ( httpError model error, Cmd.none )
 
         EditThing thing ->
             ( { model | maybeEditThing = Just thing }, Cmd.none )
@@ -114,7 +122,7 @@ update msg model =
                 ( { model | things = things, maybeEditThing = Nothing }, Cmd.none )
 
         EditThingRequest (Err error) ->
-            Debug.crash (toString error)
+            ( httpError model error, Cmd.none )
 
         CancelEdit ->
             ( { model | maybeEditThing = Nothing }, Cmd.none )
@@ -147,8 +155,35 @@ view model =
                   )
                 ]
             , ul [ class "list" ] (List.map (listItem model.maybeEditThing) model.things)
+            , errorNotification model.maybeError
             ]
         ]
+
+
+errorNotification : Maybe Http.Error -> Html Msg
+errorNotification maybeError =
+    case maybeError of
+        Just error ->
+            div [ class "notification notification--error" ]
+                [ h2 [ class "notification__heading" ] [ text "Oops!" ]
+                , p [ class "notification__body" ] [ text (httpErrorToString error) ]
+                ]
+
+        Nothing ->
+            text ""
+
+
+httpErrorToString : Http.Error -> String
+httpErrorToString error =
+    case error of
+        Http.NetworkError ->
+            "Unable to communicate to the server; are you connected to the internet?"
+
+        Http.Timeout ->
+            "Your request took too long to complete, please try again later"
+
+        _ ->
+            "There was an issue processing your request, please try again later"
 
 
 listItem : Maybe Thing -> Thing -> Html Msg
