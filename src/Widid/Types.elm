@@ -5,7 +5,7 @@ import Time exposing (Time)
 
 
 type alias Thing =
-    { id : Int
+    { id : ThingId
     , text : String
     , time : Time
     }
