@@ -24,22 +24,14 @@ create text =
 
 delete : ThingId -> Cmd Msg
 delete id =
-    let
-        url =
-            "/things/" ++ toString id
-    in
-        HttpBuilder.delete url
-            |> HttpBuilder.withExpect (Http.expectJson Widid.Decoders.thingId)
-            |> HttpBuilder.send DeleteThingRequest
+    HttpBuilder.delete ("/things/" ++ toString id)
+        |> HttpBuilder.withExpect (Http.expectJson Widid.Decoders.thingId)
+        |> HttpBuilder.send DeleteThingRequest
 
 
 edit : Thing -> Cmd Msg
 edit thing =
-    let
-        url =
-            "/things/" ++ toString thing.id
-    in
-        HttpBuilder.put url
-            |> HttpBuilder.withExpect (Http.expectJson Widid.Decoders.thing)
-            |> HttpBuilder.withJsonBody (Widid.Encoders.editThing thing)
-            |> HttpBuilder.send EditThingRequest
+    HttpBuilder.put ("/things/" ++ toString thing.id)
+        |> HttpBuilder.withExpect (Http.expectJson Widid.Decoders.thing)
+        |> HttpBuilder.withJsonBody (Widid.Encoders.editThing thing)
+        |> HttpBuilder.send EditThingRequest
