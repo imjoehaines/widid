@@ -2,7 +2,8 @@ module Main exposing (..)
 
 import Html exposing (Html, div, p, text, main_, header, h1, form, input, ul, li, span, a)
 import Html.Attributes exposing (class, placeholder, value, href)
-import Html.Events exposing (onSubmit, onInput, onClick)
+import Html.Events exposing (onSubmit, onInput, onWithOptions)
+import Json.Decode
 import Task
 import Time exposing (Time)
 import Time.Format exposing (format)
@@ -83,20 +84,13 @@ update msg model =
         AddThingWithTime time ->
             ( { model
                 | newThing = ""
-                , things = model.things ++ [ makeThing model time ]
+                , things = model.things ++ [ Thing model.newThing time ]
               }
             , Cmd.none
             )
 
         ClearThings ->
             ( { model | things = [] }, Cmd.none )
-
-
-makeThing : Model -> Time -> Thing
-makeThing model time =
-    { text = model.newThing
-    , time = time
-    }
 
 
 
@@ -117,7 +111,15 @@ view model =
             , if List.length model.things == 0 then
                 text ""
               else
-                a [ class "button", href "#", onClick ClearThings ] [ text "Clear list" ]
+                a
+                    [ class "button"
+                    , href "#"
+                    , onWithOptions
+                        "click"
+                        { stopPropagation = True, preventDefault = True }
+                        (Json.Decode.succeed ClearThings)
+                    ]
+                    [ text "Clear list" ]
             ]
         ]
 
