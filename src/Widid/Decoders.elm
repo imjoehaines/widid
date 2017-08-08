@@ -21,9 +21,7 @@ thing =
 
 unixSecondsToUnixMiliseconds : Time -> Decoder Time
 unixSecondsToUnixMiliseconds time =
-    time
-        * 1000
-        |> Json.Decode.succeed
+    Json.Decode.succeed (time * 1000)
 
 
 thingId : Decoder ThingId
