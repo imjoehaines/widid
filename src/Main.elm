@@ -150,8 +150,7 @@ view model =
                     span [ class "loading-indicator" ] [ text "Loading" ]
                    else
                     form [ onSubmit AddThing ]
-                        [ input [ class "input", placeholder "…", value model.newThing, onInput Input ] []
-                        ]
+                        [ input [ class "input", placeholder "…", value model.newThing, onInput Input ] [] ]
                   )
                 ]
             , ul [ class "list" ] (List.map (listItem model.maybeEditThing) model.things)
@@ -188,8 +187,8 @@ httpErrorToString error =
 
 listItem : Maybe Thing -> Thing -> Html Msg
 listItem maybeEditThing thing =
-    li [ class "thing-row" ]
-        (case maybeEditThing of
+    li [ class "thing-row" ] <|
+        case maybeEditThing of
             Nothing ->
                 renderThing thing
 
@@ -198,7 +197,6 @@ listItem maybeEditThing thing =
                     renderEditThing editThing
                 else
                     renderThing thing
-        )
 
 
 renderThing : Thing -> List (Html Msg)
