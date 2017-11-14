@@ -11,7 +11,7 @@ import Time.Format exposing (format)
 main : Program Never Model Msg
 main =
     Html.program
-        { subscriptions = subscriptions
+        { subscriptions = (\_ -> Sub.none)
         , view = view
         , update = update
         , init = init
@@ -44,15 +44,6 @@ initialModel =
 init : ( Model, Cmd Msg )
 init =
     ( initialModel, Cmd.none )
-
-
-
--- SUBSCRIPTIONS
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
 
 
 
