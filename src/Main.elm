@@ -223,9 +223,14 @@ renderThing timeZone thing =
 
 humanReadableTime : Time.Zone -> Time.Posix -> String
 humanReadableTime timeZone time =
-    String.fromInt (Time.toHour timeZone time)
+    padWithZero (String.fromInt (Time.toHour timeZone time))
         ++ ":"
-        ++ String.fromInt (Time.toMinute timeZone time)
+        ++ padWithZero (String.fromInt (Time.toMinute timeZone time))
+
+
+padWithZero : String -> String
+padWithZero =
+    String.padLeft 2 '0'
 
 
 renderEditThing : Thing -> List (Html Msg)
