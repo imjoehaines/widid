@@ -1,18 +1,20 @@
-module Main exposing (..)
+module Main exposing (Model, errorNotification, httpError, httpErrorToString, init, initialModel, listItem, main, renderEditThing, renderThing, update, updateEditedThing, view)
 
-import Html exposing (Html, div, p, text, main_, header, h1, h2, form, input, ul, li, span, a)
-import Html.Attributes exposing (class, placeholder, value, href, classList)
-import Html.Events exposing (onSubmit, onInput, onClick)
+import Browser
+import Html exposing (Html, a, div, form, h1, h2, header, input, li, main_, p, span, text, ul)
+import Html.Attributes exposing (class, classList, href, placeholder, value)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
-import Time.Format exposing (format)
-import Widid.Types exposing (Thing, ThingId, Msg(..))
+import Task
+import Time
 import Widid.Requests
+import Widid.Types exposing (Msg(..), Thing, ThingId)
 
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    Html.program
-        { subscriptions = (\_ -> Sub.none)
+    Browser.element
+        { subscriptions = \_ -> Sub.none
         , view = view
         , update = update
         , init = init
@@ -29,6 +31,7 @@ type alias Model =
     , maybeEditThing : Maybe Thing
     , loading : Bool
     , maybeError : Maybe Http.Error
+    , timeZone : Time.Zone
     }
 
 
@@ -39,12 +42,13 @@ initialModel =
     , maybeEditThing = Nothing
     , loading = True
     , maybeError = Nothing
+    , timeZone = Time.utc
     }
 
 
-init : ( Model, Cmd Msg )
-init =
-    ( initialModel, Widid.Requests.all )
+init : () -> ( Model, Cmd Msg )
+init _ =
+    ( initialModel, Cmd.batch [ Widid.Requests.all, Task.perform SetTimeZone Time.here ] )
 
 
 
@@ -71,6 +75,7 @@ update msg model =
         AddThing ->
             if String.trim model.newThing == "" then
                 ( model, Cmd.none )
+
             else
                 ( model, Widid.Requests.create model.newThing )
 
@@ -88,7 +93,7 @@ update msg model =
                 things =
                     List.filter (\thing -> thing.id /= id) model.things
             in
-                ( { model | things = things }, Cmd.none )
+            ( { model | things = things }, Cmd.none )
 
         DeleteThingRequest (Err error) ->
             ( httpError model error, Cmd.none )
@@ -106,11 +111,12 @@ update msg model =
                         editedThing =
                             { thingToEdit | text = text }
                     in
-                        ( { model | maybeEditThing = Just editedThing }, Cmd.none )
+                    ( { model | maybeEditThing = Just editedThing }, Cmd.none )
 
         ConfirmEditThing editedThing ->
             if String.trim editedThing.text == "" then
                 ( model, Cmd.none )
+
             else
                 ( model, Widid.Requests.edit editedThing )
 
@@ -119,7 +125,7 @@ update msg model =
                 things =
                     List.map (updateEditedThing editedThing) model.things
             in
-                ( { model | things = things, maybeEditThing = Nothing }, Cmd.none )
+            ( { model | things = things, maybeEditThing = Nothing }, Cmd.none )
 
         EditThingRequest (Err error) ->
             ( httpError model error, Cmd.none )
@@ -127,11 +133,15 @@ update msg model =
         CancelEdit ->
             ( { model | maybeEditThing = Nothing }, Cmd.none )
 
+        SetTimeZone newTimeZone ->
+            ( { model | timeZone = newTimeZone }, Cmd.none )
+
 
 updateEditedThing : Thing -> Thing -> Thing
 updateEditedThing editedThing thing =
     if thing.id == editedThing.id then
         editedThing
+
     else
         thing
 
@@ -146,14 +156,14 @@ view model =
         [ div [ class "container" ]
             [ header [ class "heading" ]
                 [ h1 [ class "main-heading" ] [ text "widid" ]
-                , (if model.loading == True then
+                , if model.loading == True then
                     span [ class "loading-indicator" ] [ text "Loading" ]
-                   else
+
+                  else
                     form [ onSubmit AddThing ]
                         [ input [ class "input", placeholder "…", value model.newThing, onInput Input ] [] ]
-                  )
                 ]
-            , ul [ class "list" ] (List.map (listItem model.maybeEditThing) model.things)
+            , ul [ class "list" ] (List.map (listItem model.timeZone model.maybeEditThing) model.things)
             , errorNotification model.maybeError
             ]
         ]
@@ -185,29 +195,37 @@ httpErrorToString error =
             "There was an issue processing your request, please try again later"
 
 
-listItem : Maybe Thing -> Thing -> Html Msg
-listItem maybeEditThing thing =
+listItem : Time.Zone -> Maybe Thing -> Thing -> Html Msg
+listItem timeZone maybeEditThing thing =
     li [ class "thing-row" ] <|
         case maybeEditThing of
             Nothing ->
-                renderThing thing
+                renderThing timeZone thing
 
             Just editThing ->
                 if editThing.id == thing.id then
                     renderEditThing editThing
+
                 else
-                    renderThing thing
+                    renderThing timeZone thing
 
 
-renderThing : Thing -> List (Html Msg)
-renderThing thing =
+renderThing : Time.Zone -> Thing -> List (Html Msg)
+renderThing timeZone thing =
     [ p [ class "text" ] [ text thing.text ]
-    , span [ class "time" ] [ text (format "%H:%M" thing.time) ]
+    , span [ class "time" ] [ text (humanReadableTime timeZone thing.time) ]
     , div [ class "icon-container" ]
         [ a [ class "icon icon--edit", href "#", onClick (EditThing thing) ] [ text "Edit" ]
         , a [ class "icon icon--delete", href "#", onClick (DeleteThing thing.id) ] [ text "Delete" ]
         ]
     ]
+
+
+humanReadableTime : Time.Zone -> Time.Posix -> String
+humanReadableTime timeZone time =
+    String.fromInt (Time.toHour timeZone time)
+        ++ ":"
+        ++ String.fromInt (Time.toMinute timeZone time)
 
 
 renderEditThing : Thing -> List (Html Msg)

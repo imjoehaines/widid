@@ -1,8 +1,8 @@
-module Widid.Decoders exposing (thingList, thing, thingId)
+module Widid.Decoders exposing (thing, thingId, thingList)
 
-import Json.Decode exposing (Decoder, int, float, string, list, field)
-import Json.Decode.Pipeline exposing (decode, required, custom)
-import Time exposing (Time)
+import Json.Decode exposing (Decoder, field, int, list, string)
+import Json.Decode.Pipeline exposing (custom, required)
+import Time
 import Widid.Types exposing (Thing, ThingId)
 
 
@@ -13,15 +13,15 @@ thingList =
 
 thing : Decoder Thing
 thing =
-    decode Thing
+    Json.Decode.succeed Thing
         |> required "id" int
         |> required "text" string
-        |> custom (field "time" float |> Json.Decode.andThen unixSecondsToUnixMiliseconds)
+        |> custom (field "time" int |> Json.Decode.andThen unixSecondsToUnixMiliseconds)
 
 
-unixSecondsToUnixMiliseconds : Time -> Decoder Time
+unixSecondsToUnixMiliseconds : Int -> Decoder Time.Posix
 unixSecondsToUnixMiliseconds time =
-    Json.Decode.succeed (time * 1000)
+    Json.Decode.succeed (Time.millisToPosix (time * 1000))
 
 
 thingId : Decoder ThingId

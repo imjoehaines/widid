@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "elm-make src/Main.elm --output=temp.js && uglifyjs temp.js --compress --mangle > public/index.js ; rm temp.js",
+    "build": "elm make src/Main.elm --output=temp.js && uglifyjs temp.js --compress --mangle > public/index.js ; rm temp.js",
     "watch:elm": "elm-live src/Main.elm --dir=public --output=public/index.js --debug",
     "watch:node": "nodemon index.js --ignore 'public/*'",
     "watch": "yarn run watch:elm & yarn run watch:node",

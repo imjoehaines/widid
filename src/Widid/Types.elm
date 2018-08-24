@@ -1,13 +1,13 @@
-module Widid.Types exposing (Thing, ThingId, Msg(..))
+module Widid.Types exposing (Msg(..), Thing, ThingId)
 
 import Http
-import Time exposing (Time)
+import Time
 
 
 type alias Thing =
     { id : ThingId
     , text : String
-    , time : Time
+    , time : Time.Posix
     }
 
 
@@ -27,3 +27,4 @@ type Msg
     | EditThingRequest (Result Http.Error Thing)
     | CancelEdit
     | ConfirmEditThing Thing
+    | SetTimeZone Time.Zone

@@ -1,6 +1,7 @@
-module Widid.Encoders exposing (newThing, editThing)
+module Widid.Encoders exposing (editThing, newThing)
 
 import Json.Encode
+import Time
 import Widid.Types exposing (Thing)
 
 
@@ -15,5 +16,5 @@ editThing thing =
     Json.Encode.object
         [ ( "id", Json.Encode.int thing.id )
         , ( "text", Json.Encode.string thing.text )
-        , ( "time", Json.Encode.float thing.time )
+        , ( "time", Json.Encode.int (Time.posixToMillis thing.time) )
         ]

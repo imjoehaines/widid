@@ -12,7 +12,9 @@
 
   <script src="/index.js"></script>
   <script>
-    window.Elm.Main.embed(document.getElementById('app'))
+    window.Elm.Main.init({
+      node: document.getElementById('app')
+    })
   </script>
 </body>
 </html>

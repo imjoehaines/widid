@@ -1,10 +1,10 @@
-module Widid.Requests exposing (all, create, edit, delete)
+module Widid.Requests exposing (all, create, delete, edit)
 
 import Http
 import HttpBuilder
 import Widid.Decoders
 import Widid.Encoders
-import Widid.Types exposing (Thing, ThingId, Msg(..))
+import Widid.Types exposing (Msg(..), Thing, ThingId)
 
 
 all : Cmd Msg
@@ -24,14 +24,14 @@ create text =
 
 delete : ThingId -> Cmd Msg
 delete id =
-    HttpBuilder.delete ("/things/" ++ toString id)
+    HttpBuilder.delete ("/things/" ++ String.fromInt id)
         |> HttpBuilder.withExpect (Http.expectJson Widid.Decoders.thingId)
         |> HttpBuilder.send DeleteThingRequest
 
 
 edit : Thing -> Cmd Msg
 edit thing =
-    HttpBuilder.put ("/things/" ++ toString thing.id)
+    HttpBuilder.put ("/things/" ++ String.fromInt thing.id)
         |> HttpBuilder.withExpect (Http.expectJson Widid.Decoders.thing)
         |> HttpBuilder.withJsonBody (Widid.Encoders.editThing thing)
         |> HttpBuilder.send EditThingRequest

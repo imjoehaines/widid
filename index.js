@@ -37,7 +37,7 @@ app.post('/things', tryCatch(async (request, response, next) => {
     `SELECT id, "text", CAST(strftime("%s", date_created) AS INT) AS time
      FROM thing
      WHERE id = $id`,
-     { $id: id }
+    { $id: id }
   )
 
   response.status(201)
@@ -53,7 +53,7 @@ app.put('/things/:thingId', tryCatch(async (request, response, next) => {
     `SELECT id, "text", CAST(strftime("%s", date_created) AS INT) AS time
      FROM thing
      WHERE id = $id`,
-     { $id: id }
+    { $id: id }
   )
 
   response.json(thing)
@@ -65,6 +65,6 @@ app.use((err, request, response, next) => {
 })
 
 db.open('./db.sq3')
-.then(() => db.migrate(process.env.NODE_ENV !== 'production' && { force: 'last' }))
-.then(() => app.listen(3000))
-.catch(err => console.error(err))
+  .then(() => db.migrate(process.env.NODE_ENV !== 'production' && { force: 'last' }))
+  .then(() => app.listen(3000))
+  .catch(err => console.error(err))
