@@ -1,3 +1,4 @@
+const compression = require('compression')
 const bodyParser = require('body-parser')
 const express = require('express')
 const db = require('sqlite')
@@ -7,6 +8,7 @@ const tryCatch = require('async-error-catcher').default
 
 const app = express()
 
+app.use(compression())
 app.use(bodyParser.json())
 app.use(morgan('combined'))
 app.use(express.static(path.resolve(__dirname, 'public')))
